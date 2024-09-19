@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:examen1_zrl/const.dart';
+import 'package:examen1_zrl/utils/const.dart';
 import 'package:examen1_zrl/home.dart';
 
 class Login extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:examen1_zrl/const.dart' as con;
+import 'package:examen1_zrl/utils/const.dart' as con;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,14 +12,8 @@ class _HomeState extends State<Home> {
   late List listaExamen;
 
   @override
-
-  ///Cada inicie la vista carga/actualiza las variables
-  ///primera acción antes de cargar toda la vista
   void initState() {
-    //listaExamen = con.listaExamen; ///listaExamen inmutable o de tipo que no permita tener cambios
-    listaExamen = List.from(
-        con.listaExamen); // Crea una copia mutable de la listaExamen original
-    // TODO: implement initState
+    listaExamen = List.from(con.listaExamen);
     super.initState();
   }
 
@@ -31,22 +25,34 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
 
             ///Crea un scrool
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Container(
-                    ///MediaQuery.of(context).size.height * 0.5 = /2 -> 50%
-                    ///MediaQuery.of(context).size.height * 0.25 = /4 -> 25%
+                    width: 400,
+                    height: 35,
+                    padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Text(
+                      'Notificaciones de actividades',
+                      style: TextStyle(
+                          color: con.titulos,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Container(
                     height: size.height,
-
-                    ///100%
                     width: size.width,
-
-                    ///100%
-                    padding: EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: ListView.builder(
                       padding: const EdgeInsets.all(8),
                       itemCount: listaExamen.length,
@@ -58,19 +64,19 @@ class _HomeState extends State<Home> {
                         ///$ - no usar
                         print('ID: ${datos[0]}');
 
-                        /*return datos[5] == '1'
+                        return int.parse(datos[0]) % 2 == 0
                             ? createCard(
-                                txtNegritas: datos[1],
-                                txtNormal1: datos[2],
-                                txtNormal2: datos[3],
-                                numero: datos[4],
+                                numero: datos[1],
+                                titulo: datos[2],
+                                descripcion: datos[3],
+                                numeroEst: datos[4],
                                 id: datos[0],
 
                                 ///int i = 0;
                                 ///i.toString();
                               )
                             : createdCard2(
-                                datos[1], datos[2], int.parse(datos[0]));*/
+                                datos[1], datos[2], int.parse(datos[0]));
                       },
                     ),
                   ),
@@ -78,15 +84,29 @@ class _HomeState extends State<Home> {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              color: con.fondo3,
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'SEGUNDA VISTA: Leonel Zamarron Rangel',
+                  style: TextStyle(fontSize: 15, color: con.efectos),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
+      backgroundColor: con.fondo3,
     );
   }
 
-  Container createdCard2(String txtNegritas, String txt, int id) {
+  Container createdCard2(String numero, String txt, int id) {
     return Container(
-      padding: EdgeInsets.all(15.0),
-      margin: EdgeInsets.only(bottom: 20.0),
+      padding: const EdgeInsets.all(15.0),
+      margin: const EdgeInsets.only(bottom: 20.0),
 
       ///color: Colors.grey, /// -------------------------------------->  Estos dos atributos
       decoration: BoxDecoration(
@@ -94,7 +114,7 @@ class _HomeState extends State<Home> {
         borderRadius: BorderRadius.circular(40),
 
         ///                  incompatibilidad de atributos
-        color: Colors.black54,
+        color: Colors.white,
 
         /// ------------------------------------>
       ),
@@ -105,7 +125,7 @@ class _HomeState extends State<Home> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(txtNegritas),
+                  Text(numero),
                   Text(txt),
                 ],
               )),
@@ -117,7 +137,7 @@ class _HomeState extends State<Home> {
               onTap: () {
                 print("Se edita el dato del id: $id");
               },
-              child: Icon(Icons.edit),
+              child: const Icon(Icons.edit),
             ),
           ),
           Expanded(
@@ -133,7 +153,7 @@ class _HomeState extends State<Home> {
                 },
                 icon: const Icon(
                   Icons.delete,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               )),
         ],
@@ -159,26 +179,28 @@ class _HomeState extends State<Home> {
   }
 }
 
+// ignore: camel_case_types
 class createCard extends StatelessWidget {
   ///Variable con final es decir que se le asignará valor más adelante
-  final String txtNegritas;
-  final String txtNormal1;
-  final String txtNormal2;
   final String numero;
+  final String titulo;
+  final String descripcion;
+  final String numeroEst;
   final String id;
   const createCard({
     super.key,
-    required this.txtNegritas,
-    required this.txtNormal1,
-    required this.txtNormal2,
     required this.numero,
+    required this.titulo,
+    required this.descripcion,
+    required this.numeroEst,
     required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(15.0),
+      margin: const EdgeInsets.only(bottom: 20.0),
 
       ///color: Colors.grey, /// -------------------------------------->  Estos dos atributos
       decoration: BoxDecoration(
@@ -186,7 +208,7 @@ class createCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(40),
 
         ///                  incompatibilidad de atributos
-        color: Colors.black54,
+        color: Colors.white,
 
         /// ------------------------------------>
       ),
@@ -194,7 +216,7 @@ class createCard extends StatelessWidget {
         children: [
           Expanded(
             flex: 8,
-            child: Text(txtNegritas),
+            child: Text(numero),
           ),
           Expanded(
             flex: 2,
@@ -204,9 +226,9 @@ class createCard extends StatelessWidget {
                 onTap: () {
                   print("Se edita el dato del id: $id");
                 },
-                child: Icon(Icons.edit)),
+                child: const Icon(Icons.edit)),
           ),
-          Expanded(
+          const Expanded(
             flex: 2,
             child: Icon(Icons.delete),
           ),
