@@ -1,3 +1,4 @@
+import 'package:examen1_zrl/more_info.dart';
 import 'package:flutter/material.dart';
 import 'package:examen1_zrl/utils/const.dart' as con;
 
@@ -86,17 +87,23 @@ class _HomeState extends State<Home> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              color: con.fondo3,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'SEGUNDA VISTA: Leonel Zamarron Rangel',
-                  style: TextStyle(fontSize: 15, color: con.efectos),
+            child: InkWell(
+              child: Container(
+                color: con.fondo3,
+                child: const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'SEGUNDA VISTA: Leonel Zamarron Rangel',
+                    style: TextStyle(fontSize: 15, color: con.efectos),
+                  ),
                 ),
               ),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const MoreInfo()));
+              },
             ),
-          ),
+          )
         ],
       ),
       backgroundColor: con.fondo3,
