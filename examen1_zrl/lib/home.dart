@@ -10,7 +10,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late List listaExamen;
+  late List<String> listaExamen;
+  final List<int> numerosNoEliminables = [10, 15, 20, 23];
 
   @override
   void initState() {
@@ -20,7 +21,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    ///Forma de obtener el tamaño de nuestra pantalla
+    /// Forma de obtener el tamaño de nuestra pantalla
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
@@ -28,56 +29,52 @@ class _HomeState extends State<Home> {
           Padding(
             padding: const EdgeInsets.all(20.0),
 
-            ///Crea un scrool
+            /// Crea un scroll
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Container(
                     width: 400,
                     height: 35,
                     padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: const Text(
                       'Notificaciones de actividades',
                       style: TextStyle(
-                          color: con.titulos,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600),
+                        color: con.titulos,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  Container(
-                    height: size.height,
+                  SizedBox(
+                    height: size.height - 150,
                     width: size.width,
-                    padding: const EdgeInsets.all(20.0),
                     child: ListView.builder(
                       padding: const EdgeInsets.all(8),
                       itemCount: listaExamen.length,
                       itemBuilder: (BuildContext context, int index) {
-                        ///tipo var es una variable que se adapta o toma el
-                        ///tipo de dato que se le asigna
                         var datos = listaExamen[index].toString().split('#');
+                        int id = int.tryParse(datos[0]) ??
+                            -1; // Convertir ID a entero
+                        print('ID: $id');
 
-                        ///$ - no usar
-                        print('ID: ${datos[0]}');
-
-                        return int.parse(datos[0]) % 2 == 0
-                            ? createCard(
+                        return id % 2 == 0
+                            ? CreateCard(
                                 numero: datos[1],
                                 titulo: datos[2],
                                 descripcion: datos[3],
                                 numeroEst: datos[4],
-                                id: datos[0],
-
-                                ///int i = 0;
-                                ///i.toString();
+                                id: id.toString(),
+                                lista: listaExamen,
+                                onDelete: () =>
+                                    _eliminarElemento(int.parse(datos[1]), id),
                               )
-                            : createdCard2(
-                                datos[1], datos[2], int.parse(datos[0]));
+                            : createdCard2(datos[1], datos[2], id);
                       },
                     ),
                   ),
@@ -99,108 +96,120 @@ class _HomeState extends State<Home> {
                 ),
               ),
               onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => const MoreInfo()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MoreInfo()),
+                );
               },
             ),
-          )
+          ),
         ],
       ),
       backgroundColor: con.fondo3,
     );
   }
 
+  /// Función para eliminar un elemento, mostrando Snackbar y evitando la eliminación de ciertos IDs
+  void _eliminarElemento(int numero, int id) {
+    if (numerosNoEliminables.contains(numero)) {
+      showSnackBar('El elemento con numero $numero no se puede eliminar', 3);
+    } else {
+      setState(() {
+        listaExamen.removeAt(id);
+        _actualizarIds(id); // Actualizar los numeros mayores
+        showSnackBar('Se eliminó el elemento con el numero: $numero', 3);
+      });
+    }
+  }
+
+  /// Función para actualizar los IDs de los elementos que son mayores al ID eliminado
+  void _actualizarIds(int idEliminado) {
+    for (int i = 0; i < listaExamen.length; i++) {
+      var datos = listaExamen[i].split('#');
+      int id = int.tryParse(datos[0]) ?? -1;
+
+      if (id > idEliminado) {
+        id--; // Reducir el ID en 1
+        datos[0] = id.toString(); // Actualizar el ID en la lista
+        listaExamen[i] = datos.join('#'); // Reemplazar el elemento actualizado
+      }
+    }
+  }
+
   Container createdCard2(String numero, String txt, int id) {
     return Container(
       padding: const EdgeInsets.all(15.0),
       margin: const EdgeInsets.only(bottom: 20.0),
-
-      ///color: Colors.grey, /// -------------------------------------->  Estos dos atributos
       decoration: BoxDecoration(
-        ///                                juntos, marcará un error por
         borderRadius: BorderRadius.circular(40),
-
-        ///                  incompatibilidad de atributos
         color: Colors.white,
-
-        /// ------------------------------------>
       ),
       child: Row(
         children: [
           Expanded(
-              flex: 8,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(numero),
-                  Text(txt),
-                ],
-              )),
+            flex: 8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(numero),
+                Text(txt),
+              ],
+            ),
+          ),
           Expanded(
             flex: 2,
-
-            ///Convertir cualquier widget con acción de boton
             child: InkWell(
               onTap: () {
-                print("Se edita el dato del id: $id");
+                print("Se edita el dato con el índice: $id");
               },
               child: const Icon(Icons.edit),
             ),
           ),
           Expanded(
-              flex: 2,
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    listaExamen.removeAt(id);
-
-                    ///Eliminar un dato de la listaExamen
-                    showSnackBar('Se elimino el elemento con el id: $id', 15);
-                  });
-                },
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.black,
-                ),
-              )),
+            flex: 2,
+            child: IconButton(
+              onPressed: () {
+                _eliminarElemento(int.parse(numero), id);
+              },
+              icon: const Icon(Icons.delete, color: Colors.black),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  ///AREA PARA LAS FUNCIONES
   void showSnackBar(String texto, int duracion) {
     final snackBar = SnackBar(
       content: Text(texto),
       duration: Duration(seconds: duracion),
       action: SnackBarAction(
-        onPressed: () {
-          // Cualquier acción al dar clic sobre el widget
-        },
+        onPressed: () {},
         label: 'Cerrar',
       ),
     );
-
-    // Muestra el SnackBar usando ScaffoldMessenger
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
 
-// ignore: camel_case_types
-class createCard extends StatelessWidget {
-  ///Variable con final es decir que se le asignará valor más adelante
+class CreateCard extends StatelessWidget {
   final String numero;
   final String titulo;
   final String descripcion;
   final String numeroEst;
   final String id;
-  const createCard({
+  final List lista;
+  final VoidCallback onDelete;
+
+  const CreateCard({
     super.key,
     required this.numero,
     required this.titulo,
     required this.descripcion,
     required this.numeroEst,
     required this.id,
+    required this.lista,
+    required this.onDelete,
   });
 
   @override
@@ -208,16 +217,9 @@ class createCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15.0),
       margin: const EdgeInsets.only(bottom: 20.0),
-
-      ///color: Colors.grey, /// -------------------------------------->  Estos dos atributos
       decoration: BoxDecoration(
-        ///                                juntos, marcará un error por
         borderRadius: BorderRadius.circular(40),
-
-        ///                  incompatibilidad de atributos
         color: Colors.white,
-
-        /// ------------------------------------>
       ),
       child: Row(
         children: [
@@ -227,17 +229,19 @@ class createCard extends StatelessWidget {
           ),
           Expanded(
             flex: 2,
-
-            ///Convertir cualquier widget con acción de boton
             child: InkWell(
-                onTap: () {
-                  print("Se edita el dato del id: $id");
-                },
-                child: const Icon(Icons.edit)),
+              onTap: () {
+                print("Se edita el dato con el id: $id");
+              },
+              child: const Icon(Icons.edit),
+            ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
-            child: Icon(Icons.delete),
+            child: IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete),
+            ),
           ),
         ],
       ),
